@@ -12,6 +12,9 @@ from .mixin.status import ArbitrageStatusMixin
 LOGGER = logging.getLogger(__name__)
 
 
+WAIT_PERIOD_BETWEEN_DIRECTION_SWITCH = None  # 0.2
+
+
 @dataclass
 class DualQuoteStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
     """
@@ -127,10 +130,11 @@ class DualQuoteStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
             # need to sell
 
             if self.latest_status == "buying":
-                self.latest_status = "idling"
-                LOGGER.info(f"status: {self.latest_status}")
-                self.idle_until = time.time() + 0.2
-                return False
+                if WAIT_PERIOD_BETWEEN_DIRECTION_SWITCH is not None:
+                    self.latest_status = "idling"
+                    LOGGER.info(f"status: {self.latest_status}")
+                    self.idle_until = time.time() + WAIT_PERIOD_BETWEEN_DIRECTION_SWITCH
+                    return False
 
             ask_price = ask_price - symbol_info.quote_step_f * 1.5
             ask_price = symbol_info.round_price(ask_price, round_up=False)
@@ -150,10 +154,11 @@ class DualQuoteStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
             # need to buy
 
             if self.latest_status == "selling":
-                self.latest_status = "idling"
-                LOGGER.info(f"status: {self.latest_status}")
-                self.idle_until = time.time() + 0.2
-                return False
+                if WAIT_PERIOD_BETWEEN_DIRECTION_SWITCH is not None:
+                    self.latest_status = "idling"
+                    LOGGER.info(f"status: {self.latest_status}")
+                    self.idle_until = time.time() + WAIT_PERIOD_BETWEEN_DIRECTION_SWITCH
+                    return False
 
             bid_price = bid_price + symbol_info.quote_step_f * 1.5
             bid_price = symbol_info.round_price(bid_price, round_up=True)
