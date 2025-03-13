@@ -5,7 +5,7 @@ from .order_action import QuoteOrderActionMixin
 
 LOGGER = logging.getLogger(__name__)
 
-QUOTE_MINIMUM_PERIOD = None  # 0.2
+MINIMUM_QUOTE_LIFETIME = None  # 0.2
 
 class OneSideQuoteMixin(QuoteOrderActionMixin):
     def quote_bid_side(self, bid_qty: float, reason: str = None):  # unsigned
@@ -28,7 +28,7 @@ class OneSideQuoteMixin(QuoteOrderActionMixin):
                 return self._cancel_order(order, reason=f"order filled, i.e., {order.filled} vs 0")
 
             if depth[5] > (order.quantity - order.filled) + 1e-6:
-                if QUOTE_MINIMUM_PERIOD is None or time.time() - order.timestamp > QUOTE_MINIMUM_PERIOD:
+                if MINIMUM_QUOTE_LIFETIME is None or time.time() - order.timestamp > MINIMUM_QUOTE_LIFETIME:
                     return self._cancel_order(
                         order, reason=f"order is not the unique bid, i.e., {order.quantity} vs {depth[5]}"
                     )
@@ -65,7 +65,7 @@ class OneSideQuoteMixin(QuoteOrderActionMixin):
                 return self._cancel_order(order, reason=f"order filled, i.e., {order.filled} vs 0")
 
             if depth[6] > (order.quantity - order.filled) + 1e-6:
-                if QUOTE_MINIMUM_PERIOD is None or time.time() - order.timestamp > QUOTE_MINIMUM_PERIOD:
+                if MINIMUM_QUOTE_LIFETIME is None or time.time() - order.timestamp > MINIMUM_QUOTE_LIFETIME:
                     return self._cancel_order(
                         order,
                         reason=f"order is not the unique ask, i.e., {order.quantity - order.filled} vs {depth[6]}",
