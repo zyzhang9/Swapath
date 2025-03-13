@@ -27,7 +27,7 @@ class OneSideQuoteMixin(QuoteOrderActionMixin):
                 return self._cancel_order(order, reason=f"order filled, i.e., {order.filled} vs 0")
 
             if depth[5] > (order.quantity - order.filled) + 1e-6:
-                if time.time() - order.timestamp > 0.2:
+                if time.time() - order.timestamp > 0.2 or True:
                     return self._cancel_order(
                         order, reason=f"order is not the unique bid, i.e., {order.quantity} vs {depth[5]}"
                     )
@@ -64,7 +64,7 @@ class OneSideQuoteMixin(QuoteOrderActionMixin):
                 return self._cancel_order(order, reason=f"order filled, i.e., {order.filled} vs 0")
 
             if depth[6] > (order.quantity - order.filled) + 1e-6:
-                if time.time() - order.timestamp > 0.2:
+                if time.time() - order.timestamp > 0.2 or True:
                     return self._cancel_order(
                         order,
                         reason=f"order is not the unique ask, i.e., {order.quantity - order.filled} vs {depth[6]}",

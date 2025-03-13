@@ -130,7 +130,7 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                     self.to_sell = ((bid_price, bid_qty), time.time())
                     return False
 
-                if time.time() - self.to_sell[1] < 0.2:
+                if time.time() - self.to_sell[1] < 0.2 and False:
                     return False
 
                 if self.hit_ask_side(bid_qty, reason=f"ready to sell {symbol_info.base_asset}"):
@@ -151,7 +151,7 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                     self.to_buy = ((bid_price, bid_qty), time.time())
                     return False
 
-                if time.time() - self.to_buy[1] < 0.2:
+                if time.time() - self.to_buy[1] < 0.2 and False:
                     return False
 
                 # take a random order
