@@ -32,6 +32,8 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
     latest_exposure: float = None
     to_buy: Any = (None, 0)
     to_sell: Any = (None, 0)
+    bought: Any = (None, 0)
+    sold: Any = (None, 0)
 
     def __post_init__(self):
         """
@@ -123,20 +125,31 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
             target_qty = DualHitStrategy.rand_size_around(self.order_size, bid_price) / bid_price
             target_qty = symbol_info.round_size(target_qty)
 
-            # print(bid_qty, target_qty)
             if abs(bid_qty - target_qty) <= symbol_info.base_step_f:
-                # print('try hit')
-                # take a random order
+                # recognized quote
 
+                if (bid_price, bid_qty) == self.sold[0]:
+                    if time.time() - self.sold[1] < 0.05:
+                        # just sold it
+                        return False
+                    # clear sold flag
+                    self.sold = (None, time.time())
+                    
                 if (bid_price, bid_qty) != self.to_sell[0]:
+                    # new quote
                     self.to_sell = ((bid_price, bid_qty), time.time())
-                    return False
+                    if MINIMUM_QUOTE_AGE is not None:
+                        # return to check if need to wait
+                        return False
 
-                if MINIMUM_QUOTE_AGE is not None and time.time() - self.to_sell[1] < MINIMUM_QUOTE_AGE:
-                    return False
+                if MINIMUM_QUOTE_AGE is not None:
+                    if time.time() - self.to_sell[1] < MINIMUM_QUOTE_AGE:
+                        return False
 
+                # take a random order
                 if self.hit_ask_side(bid_qty, reason=f"ready to sell {symbol_info.base_asset}"):
                     self.to_sell = (None, 0)
+                    self.sold = ((bid_price, bid_qty), time.time())
                     LOGGER.info(f"bid qty: {bid_qty}, bid price: {bid_price}, target qty: {target_qty}")
                     return True
 
@@ -147,18 +160,31 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
             target_qty = DualHitStrategy.rand_size_around(self.order_size, ask_price) / ask_price
             target_qty = symbol_info.round_size(target_qty)
 
-            # print(ask_qty, target_qty)
             if abs(ask_qty - target_qty) <= symbol_info.base_step_f:
-                if (bid_price, bid_qty) != self.to_buy[0]:
-                    self.to_buy = ((bid_price, bid_qty), time.time())
-                    return False
+                # recognized quote
 
-                if MINIMUM_QUOTE_AGE is not None and time.time() - self.to_buy[1] < MINIMUM_QUOTE_AGE:
-                    return False
+                if (ask_price, ask_qty) == self.bought[0]:
+                    if time.time() - self.bought[1] < 0.05:
+                        # just bought it
+                        return False
+                    # clear bought flag
+                    self.bought = (None, time.time())
+
+                if (ask_price, ask_qty) != self.to_buy[0]:
+                    # new quote
+                    self.to_buy = ((ask_price, ask_qty), time.time())
+                    if MINIMUM_QUOTE_AGE is not None:
+                        # return to check if need to wait
+                        return False
+
+                if MINIMUM_QUOTE_AGE is not None:
+                    if time.time() - self.to_buy[1] < MINIMUM_QUOTE_AGE:
+                        return False
 
                 # take a random order
                 if self.hit_bid_side(ask_qty, reason=f"ready to buy {symbol_info.base_asset}"):
                     self.to_buy = (None, 0)
+                    self.bought = ((ask_price, ask_qty), time.time())
                     LOGGER.info(f"ask qty: {ask_qty}, ask price: {ask_price}, target qty: {target_qty}")
                     return True
 
