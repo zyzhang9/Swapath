@@ -14,6 +14,8 @@ from .mixin.status import ArbitrageStatusMixin
 LOGGER = logging.getLogger(__name__)
 
 
+MINIMUM_QUOTE_AGE = None
+
 @dataclass
 class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
     """
@@ -130,7 +132,7 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                     self.to_sell = ((bid_price, bid_qty), time.time())
                     return False
 
-                if time.time() - self.to_sell[1] < 0.2 and False:
+                if MINIMUM_QUOTE_AGE is not None and time.time() - self.to_sell[1] < MINIMUM_QUOTE_AGE:
                     return False
 
                 if self.hit_ask_side(bid_qty, reason=f"ready to sell {symbol_info.base_asset}"):
@@ -151,7 +153,7 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                     self.to_buy = ((bid_price, bid_qty), time.time())
                     return False
 
-                if time.time() - self.to_buy[1] < 0.2 and False:
+                if MINIMUM_QUOTE_AGE is not None and time.time() - self.to_buy[1] < MINIMUM_QUOTE_AGE:
                     return False
 
                 # take a random order
