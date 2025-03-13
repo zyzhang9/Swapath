@@ -136,7 +136,7 @@ class DualQuoteStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                     self.idle_until = time.time() + INTERVAL_BETWEEN_BUY_SELL
                     return False
 
-            ask_price = ask_price - symbol_info.quote_step_f * 1.5
+            ask_price = ask_price - symbol_info.quote_step_f * 0.5
             ask_price = symbol_info.round_price(ask_price, round_up=False)
             order_size = DualQuoteStrategy.rand_size_around(self.order_size, ask_price)
 
@@ -160,7 +160,7 @@ class DualQuoteStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                     self.idle_until = time.time() + INTERVAL_BETWEEN_BUY_SELL
                     return False
 
-            bid_price = bid_price + symbol_info.quote_step_f * 1.5
+            bid_price = bid_price + symbol_info.quote_step_f * 0.5
             bid_price = symbol_info.round_price(bid_price, round_up=True)
             order_size = DualQuoteStrategy.rand_size_around(self.order_size, bid_price)
 

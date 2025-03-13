@@ -36,7 +36,7 @@ class OneSideQuoteMixin(QuoteOrderActionMixin):
             # already the best bid
             return False
 
-        bid_price = depth[1] + symbol_info.quote_step_f * 1.5
+        bid_price = depth[1] + symbol_info.quote_step_f * 0.5
         bid_price = symbol_info.round_price(bid_price, round_up=True)
         assert bid_price * bid_qty > symbol_info.value_min
 
@@ -81,7 +81,7 @@ class OneSideQuoteMixin(QuoteOrderActionMixin):
         if depth[2] - depth[1] < symbol_info.quote_step_f * 5:
             return False
 
-        ask_price = depth[2] - symbol_info.quote_step_f * 1.5
+        ask_price = depth[2] - symbol_info.quote_step_f * 0.5
         ask_price = symbol_info.round_price(ask_price, round_up=False)
         assert ask_price * ask_qty > symbol_info.value_min
 
