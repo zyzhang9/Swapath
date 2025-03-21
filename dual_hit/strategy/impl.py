@@ -125,7 +125,7 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
             target_qty = DualHitStrategy.rand_size_around(self.order_size, bid_price) / bid_price
             target_qty = symbol_info.round_size(target_qty)
 
-            if abs(bid_qty - target_qty) <= symbol_info.base_step_f:
+            if abs(bid_qty - target_qty) <= symbol_info.base_step_f * 2:
                 # recognized quote
 
                 if (bid_price, bid_qty) == self.sold[0]:
@@ -160,7 +160,7 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
             target_qty = DualHitStrategy.rand_size_around(self.order_size, ask_price) / ask_price
             target_qty = symbol_info.round_size(target_qty)
 
-            if abs(ask_qty - target_qty) <= symbol_info.base_step_f:
+            if abs(ask_qty - target_qty) <= symbol_info.base_step_f * 2:
                 # recognized quote
 
                 if (ask_price, ask_qty) == self.bought[0]:
