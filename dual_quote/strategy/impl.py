@@ -89,7 +89,9 @@ class DualQuoteStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
 
         symbol_info = self.quoting_leg.symbol_info
         bid_price = self.quoting_leg.depth[1]
+        bid_qty = self.quoting_leg.depth[5]
         ask_price = self.quoting_leg.depth[2]
+        ask_qty = self.quoting_leg.depth[6]
 
         base_total = self._get_base_total()
         base_available = self._get_base_available()
@@ -136,12 +138,19 @@ class DualQuoteStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                     self.idle_until = time.time() + INTERVAL_BETWEEN_BUY_SELL
                     return False
 
-            ask_price = ask_price - symbol_info.quote_step_f * 0.5
-            ask_price = symbol_info.round_price(ask_price, round_up=False)
             order_size = DualQuoteStrategy.rand_size_around(self.order_size, ask_price)
+            if ask_qty < order_size / 2:
+                # reuse existing quote
+                ask_qty = order_size - ask_qty
+            else:
+                # new quote
+                ask_price = ask_price - symbol_info.quote_step_f * 0.5
+                ask_price = symbol_info.round_price(ask_price, round_up=False)
+                order_size = DualQuoteStrategy.rand_size_around(self.order_size, ask_price)
 
-            ask_qty = order_size / ask_price
-            if self.quote_ask_side(ask_qty, reason=f"need to sell {symbol_info.base_asset}"):
+                ask_qty = order_size / ask_price
+
+            if self.quote_ask_side(ask_price, ask_qty, reason=f"need to sell {symbol_info.base_asset}"):
                 if self.latest_status != "selling":
                     self.latest_status = "selling"
                     LOGGER.info(f"status: {self.latest_status}")
@@ -160,12 +169,18 @@ class DualQuoteStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                     self.idle_until = time.time() + INTERVAL_BETWEEN_BUY_SELL
                     return False
 
-            bid_price = bid_price + symbol_info.quote_step_f * 0.5
-            bid_price = symbol_info.round_price(bid_price, round_up=True)
             order_size = DualQuoteStrategy.rand_size_around(self.order_size, bid_price)
+            if bid_qty < order_size / 2:
+                # reuse existing quote
+                bid_qty = order_size - bid_qty
+            else:
+                # new quote
+                bid_price = bid_price + symbol_info.quote_step_f * 0.5
+                bid_price = symbol_info.round_price(bid_price, round_up=True)
+                order_size = DualQuoteStrategy.rand_size_around(self.order_size, bid_price)
 
             bid_qty = order_size / bid_price
-            if self.quote_bid_side(bid_qty, reason=f"need to buy {symbol_info.base_asset}"):
+            if self.quote_bid_side(bid_price, bid_qty, reason=f"need to buy {symbol_info.base_asset}"):
                 if self.latest_status != "buying":
                     self.latest_status = "buying"
                     LOGGER.info(f"status: {self.latest_status}")
