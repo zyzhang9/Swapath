@@ -126,6 +126,8 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
             target_qty = symbol_info.round_size(target_qty)
 
             if abs(bid_qty - target_qty) <= symbol_info.base_step_f * 2:
+                bid_qty = min(bid_qty, target_qty)
+
                 # recognized quote
 
                 if (bid_price, bid_qty) == self.sold[0]:
@@ -147,7 +149,7 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                         return False
 
                 # take a random order
-                if self.hit_ask_side(bid_qty, reason=f"ready to sell {symbol_info.base_asset}"):
+                if self.hit_ask_side(bid_qty, reason=f"ready to sell {symbol_info.base_asset}", time_in_force="fok"):
                     self.to_sell = (None, 0)
                     self.sold = ((bid_price, bid_qty), time.time())
                     LOGGER.info(f"bid qty: {bid_qty}, bid price: {bid_price}, target qty: {target_qty}")
@@ -161,6 +163,8 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
             target_qty = symbol_info.round_size(target_qty)
 
             if abs(ask_qty - target_qty) <= symbol_info.base_step_f * 2:
+                ask_qty = min(ask_qty, target_qty)
+
                 # recognized quote
 
                 if (ask_price, ask_qty) == self.bought[0]:
@@ -182,7 +186,7 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                         return False
 
                 # take a random order
-                if self.hit_bid_side(ask_qty, reason=f"ready to buy {symbol_info.base_asset}"):
+                if self.hit_bid_side(ask_qty, reason=f"ready to buy {symbol_info.base_asset}", time_in_force="fok"):
                     self.to_buy = (None, 0)
                     self.bought = ((ask_price, ask_qty), time.time())
                     LOGGER.info(f"ask qty: {ask_qty}, ask price: {ask_price}, target qty: {target_qty}")

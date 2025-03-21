@@ -65,17 +65,17 @@ class QuoteOrderActionMixin(QuoteMixinBase, OrderMixin):
 
         return self._place_order(place_order_cmd, reason=reason)
 
-    def _place_bid_order_taker(self, price: float, quantity: float, *args, reason: str = "new quote"):
+    def _place_bid_order_taker(self, price: float, quantity: float, *args, time_in_force: str="gtc", reason: str = "new quote"):
         if not (
-            place_order_cmd := self.quoting_leg.generate_taker_order_cmd(quantity, price=price, time_in_force="fok")
+            place_order_cmd := self.quoting_leg.generate_taker_order_cmd(quantity, price=price, time_in_force=time_in_force)
         ):
             return False
 
         return self._place_order(place_order_cmd, reason=reason)
 
-    def _place_ask_order_taker(self, price: float, quantity: float, *args, reason: str = "new quote"):
+    def _place_ask_order_taker(self, price: float, quantity: float, *args, time_in_force: str="gtc", reason: str = "new quote"):
         if not (
-            place_order_cmd := self.quoting_leg.generate_taker_order_cmd(-quantity, price=price, time_in_force="fok")
+            place_order_cmd := self.quoting_leg.generate_taker_order_cmd(-quantity, price=price, time_in_force=time_in_force)
         ):
             return False
 
