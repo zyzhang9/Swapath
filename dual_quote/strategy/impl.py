@@ -111,7 +111,7 @@ class DualQuoteStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
 
         # check space to quote, cancel all order and stop quoting
         if ask_price - bid_price < symbol_info.quote_step_f * 3:
-            for order in self.quoting_account.get_orders(active=True).values():
+            for order in self.quoting_account.get_orders(symbol=self.quoting_leg.symbol, active=True).values():
                 if self.latest_status != "stopping":
                     self.latest_status = "stopping"
                     LOGGER.info(f"status: {self.latest_status}")

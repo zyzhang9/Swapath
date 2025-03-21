@@ -14,15 +14,15 @@ class OneSideQuoteMixin(QuoteOrderActionMixin):
         assert bid_qty > symbol_info.base_min
 
         # cancel sell orders
-        for order in self.quoting_account.get_orders(active=True, side="sell").values():
+        for order in self.quoting_account.get_orders(symbol=self.quoting_leg.symbol, active=True, side="sell").values():
             return self._cancel_order(order, reason=reason)
 
         # cancel unpromising buy orders
-        for order in self.quoting_account.get_orders(active=True, side="buy").values():
+        for order in self.quoting_account.get_orders(symbol=self.quoting_leg.symbol, active=True, side="buy").values():
             if order.price < depth[1] - 1e-6:
                 return self._cancel_order(order, reason="order is not the best bid")
 
-        if self.quoting_account.get_orders(active=True, side="buy").values():
+        if self.quoting_account.get_orders(symbol=self.quoting_leg.symbol, active=True, side="buy").values():
             return False
 
         bid_price = depth[2]
@@ -41,15 +41,15 @@ class OneSideQuoteMixin(QuoteOrderActionMixin):
         assert ask_qty > symbol_info.base_min
 
         # cancel buy orders
-        for order in self.quoting_account.get_orders(active=True, side="buy").values():
+        for order in self.quoting_account.get_orders(symbol=self.quoting_leg.symbol, active=True, side="buy").values():
             return self._cancel_order(order, reason=reason)
 
         # cancel unpromising sell orders
-        for order in self.quoting_account.get_orders(active=True, side="sell").values():
+        for order in self.quoting_account.get_orders(symbol=self.quoting_leg.symbol, active=True, side="sell").values():
             if order.price < depth[1] - 1e-6:
                 return self._cancel_order(order, reason="order does not target the best bid")
 
-        if self.quoting_account.get_orders(active=True, side="sell").values():
+        if self.quoting_account.get_orders(symbol=self.quoting_leg.symbol, active=True, side="sell").values():
             return False
 
         if ask_qty > self._get_base_available():
