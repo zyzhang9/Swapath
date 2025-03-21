@@ -13,7 +13,7 @@ class QuoteCancelationMixin(QuoteOrderActionMixin):
 
         for bid_order in current_bid_orders:
             if time.time() - bid_order.timestamp > 15:
-                return self._cancel_order(bid_order, reason="redundant")
+                return self._cancel_order(bid_order, reason="too old")
 
         # filter out orders to cancel
         bid_orders_to_cancel = current_bid_orders[1:]
@@ -27,7 +27,7 @@ class QuoteCancelationMixin(QuoteOrderActionMixin):
 
         for ask_order in current_ask_orders:
             if time.time() - ask_order.timestamp > 15:
-                return self._cancel_order(ask_order, reason="redundant")
+                return self._cancel_order(ask_order, reason="too old")
 
         # filter out orders to cancel
         ask_orders_to_cancel = current_ask_orders[1:]
