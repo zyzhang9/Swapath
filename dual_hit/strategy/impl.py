@@ -14,7 +14,6 @@ from .mixin.status import ArbitrageStatusMixin
 LOGGER = logging.getLogger(__name__)
 
 
-MINIMUM_QUOTE_AGE = None
 SAME_TRADE_MINIMUM_PERIOD = 0.01 
 
 @dataclass
@@ -31,8 +30,6 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
     order_size: float = None
 
     latest_exposure: float = None
-    to_buy: Any = (None, 0)
-    to_sell: Any = (None, 0)
     bought: Any = (None, 0)
     sold: Any = (None, 0)
 
@@ -138,20 +135,8 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                     # clear sold flag
                     self.sold = (None, time.time())
 
-                if (bid_price, bid_qty) != self.to_sell[0]:
-                    # new quote
-                    self.to_sell = ((bid_price, bid_qty), time.time())
-                    if MINIMUM_QUOTE_AGE is not None:
-                        # return to check if need to wait
-                        return False
-
-                if MINIMUM_QUOTE_AGE is not None:
-                    if time.time() - self.to_sell[1] < MINIMUM_QUOTE_AGE:
-                        return False
-
                 # take a random order
                 if self.hit_ask_side(bid_qty, reason=f"ready to sell {symbol_info.base_asset}", time_in_force="fok"):
-                    self.to_sell = (None, 0)
                     self.sold = ((bid_price, bid_qty), time.time())
                     LOGGER.info(f"bid qty: {bid_qty}, bid price: {bid_price}, target qty: {target_qty}")
                     return True
@@ -175,20 +160,8 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                     # clear bought flag
                     self.bought = (None, time.time())
 
-                if (ask_price, ask_qty) != self.to_buy[0]:
-                    # new quote
-                    self.to_buy = ((ask_price, ask_qty), time.time())
-                    if MINIMUM_QUOTE_AGE is not None:
-                        # return to check if need to wait
-                        return False
-
-                if MINIMUM_QUOTE_AGE is not None:
-                    if time.time() - self.to_buy[1] < MINIMUM_QUOTE_AGE:
-                        return False
-
                 # take a random order
                 if self.hit_bid_side(ask_qty, reason=f"ready to buy {symbol_info.base_asset}", time_in_force="fok"):
-                    self.to_buy = (None, 0)
                     self.bought = ((ask_price, ask_qty), time.time())
                     LOGGER.info(f"ask qty: {ask_qty}, ask price: {ask_price}, target qty: {target_qty}")
                     return True
