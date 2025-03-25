@@ -15,7 +15,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 MINIMUM_QUOTE_AGE = None
-
+SAME_TRADE_MINIMUM_PERIOD = 0.01 
 
 @dataclass
 class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
@@ -132,7 +132,7 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                 # recognized quote
 
                 if (bid_price, bid_qty) == self.sold[0]:
-                    if time.time() - self.sold[1] < 0.05:
+                    if time.time() - self.sold[1] < SAME_TRADE_MINIMUM_PERIOD:
                         # just sold it
                         return False
                     # clear sold flag
@@ -169,7 +169,7 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                 # recognized quote
 
                 if (ask_price, ask_qty) == self.bought[0]:
-                    if time.time() - self.bought[1] < 0.05:
+                    if time.time() - self.bought[1] < SAME_TRADE_MINIMUM_PERIOD:
                         # just bought it
                         return False
                     # clear bought flag
