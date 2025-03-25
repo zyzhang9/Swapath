@@ -12,7 +12,7 @@ from .mixin.status import ArbitrageStatusMixin
 LOGGER = logging.getLogger(__name__)
 
 
-INTERVAL_BETWEEN_BUY_SELL = 0.1
+INTERVAL_BETWEEN_BUY_SELL = 0.05
 
 
 @dataclass
@@ -110,7 +110,7 @@ class DualQuoteStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                 return True
 
         # check space to quote, cancel all order and stop quoting
-        if ask_price - bid_price < symbol_info.quote_step_f * 3:
+        if ask_price - bid_price < symbol_info.quote_step_f * 2:
             for order in self.quoting_account.get_orders(symbol=self.quoting_leg.symbol, active=True).values():
                 if self.latest_status != "stopping":
                     self.latest_status = "stopping"
@@ -121,6 +121,9 @@ class DualQuoteStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
             if self.latest_status != "stopped":
                 self.latest_status = "stopped"
                 LOGGER.info(f"status: {self.latest_status}")
+            return False
+
+        if ask_price - bid_price < symbol_info.quote_step_f * 3:
             return False
 
         if self.latest_status == "idling":
