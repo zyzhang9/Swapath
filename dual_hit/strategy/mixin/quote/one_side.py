@@ -6,7 +6,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class OneSideQuoteMixin(QuoteOrderActionMixin):
-    def hit_bid_side(self, bid_qty: float, time_in_force: str="gtc", reason: str = None):  # unsigned
+    def hit_bid_side(self, bid_qty: float, time_in_force: str = "gtc", reason: str = None):  # unsigned
         depth = self.quoting_leg.depth
         assert depth[1] < depth[2]
 
@@ -33,7 +33,7 @@ class OneSideQuoteMixin(QuoteOrderActionMixin):
 
         return self._place_bid_order_taker(bid_price, bid_qty, reason=reason, time_in_force=time_in_force)
 
-    def hit_ask_side(self, ask_qty: float, time_in_force: str="gtc", reason: str = None):  # unsigned
+    def hit_ask_side(self, ask_qty: float, time_in_force: str = "gtc", reason: str = None):  # unsigned
         depth = self.quoting_leg.depth
         assert depth[1] < depth[2]
 

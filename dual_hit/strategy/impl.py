@@ -16,6 +16,7 @@ LOGGER = logging.getLogger(__name__)
 
 MINIMUM_QUOTE_AGE = None
 
+
 @dataclass
 class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
     """
@@ -136,7 +137,7 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                         return False
                     # clear sold flag
                     self.sold = (None, time.time())
-                    
+
                 if (bid_price, bid_qty) != self.to_sell[0]:
                     # new quote
                     self.to_sell = ((bid_price, bid_qty), time.time())

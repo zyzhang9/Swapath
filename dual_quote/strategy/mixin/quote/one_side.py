@@ -7,6 +7,7 @@ LOGGER = logging.getLogger(__name__)
 
 MINIMUM_QUOTE_LIFETIME = None  # 0.2
 
+
 class OneSideQuoteMixin(QuoteOrderActionMixin):
     def quote_bid_side(self, bid_price: float, bid_qty: float, reason: str = None):  # unsigned
         depth = self.quoting_leg.depth
@@ -28,11 +29,12 @@ class OneSideQuoteMixin(QuoteOrderActionMixin):
                 return self._cancel_order(order, reason=f"order filled, i.e., {order.filled} vs 0")
 
             if order.price == depth[1]:
+                quote_size = depth[1] * depth[5]
                 order_size = self.rand_size_around(self.order_size, order.price)
-                if abs(depth[5] - order_size) > self.quoting_leg.symbol_info.base_step_f * 2 * order.price:
+                if abs(quote_size - order_size) > self.quoting_leg.symbol_info.base_step_f * 2 * order.price:
                     if MINIMUM_QUOTE_LIFETIME is None or time.time() - order.timestamp > MINIMUM_QUOTE_LIFETIME:
                         return self._cancel_order(
-                            order, reason=f"order size will not be taken, i.e., {depth[5]} vs {order_size}"
+                            order, reason=f"order size will not be taken, i.e., {quote_size} vs {order_size}"
                         )
             # if depth[5] > (order.quantity - order.filled) + 1e-6:
             #     if MINIMUM_QUOTE_LIFETIME is None or time.time() - order.timestamp > MINIMUM_QUOTE_LIFETIME:
@@ -72,11 +74,12 @@ class OneSideQuoteMixin(QuoteOrderActionMixin):
                 return self._cancel_order(order, reason=f"order filled, i.e., {order.filled} vs 0")
 
             if order.price == depth[2]:
+                quote_size = depth[2] * depth[6]
                 order_size = self.rand_size_around(self.order_size, order.price)
-                if abs(depth[6] - order_size) > self.quoting_leg.symbol_info.base_step_f * 2 * order.price:
+                if abs(quote_size - order_size) > self.quoting_leg.symbol_info.base_step_f * 2 * order.price:
                     if MINIMUM_QUOTE_LIFETIME is None or time.time() - order.timestamp > MINIMUM_QUOTE_LIFETIME:
                         return self._cancel_order(
-                            order, reason=f"order size will not be taken, i.e., {depth[6]} vs {order_size}"
+                            order, reason=f"order size will not be taken, i.e., {quote_size} vs {order_size}"
                         )
 
             # if depth[6] > (order.quantity - order.filled) + 1e-6:

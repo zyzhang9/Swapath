@@ -139,9 +139,9 @@ class DualQuoteStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                     return False
 
             order_size = DualQuoteStrategy.rand_size_around(self.order_size, ask_price)
-            if ask_qty < order_size / 2:
+            if ask_qty * ask_price < order_size / 2:
                 # reuse existing quote
-                ask_qty = order_size - ask_qty
+                ask_qty = order_size / ask_price - ask_qty
             else:
                 # new quote
                 ask_price = ask_price - symbol_info.quote_step_f * 0.5
@@ -170,9 +170,9 @@ class DualQuoteStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                     return False
 
             order_size = DualQuoteStrategy.rand_size_around(self.order_size, bid_price)
-            if bid_qty < order_size / 2:
+            if bid_qty * bid_price < order_size / 2:
                 # reuse existing quote
-                bid_qty = order_size - bid_qty
+                bid_qty = order_size / bid_price - bid_qty
             else:
                 # new quote
                 bid_price = bid_price + symbol_info.quote_step_f * 0.5
