@@ -12,7 +12,7 @@ from .mixin.status import ArbitrageStatusMixin
 LOGGER = logging.getLogger(__name__)
 
 
-INTERVAL_BETWEEN_BUY_SELL = 3.0
+INTERVAL_BETWEEN_BUY_SELL = 0.1
 
 
 @dataclass
