@@ -111,7 +111,7 @@ class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
                 return True
 
         # check space to hit, cancel all order and stop quoting
-        if ask_price - bid_price < symbol_info.quote_step_f * 2:
+        if ask_price - bid_price < symbol_info.quote_step_f:
             for order in self.quoting_account.get_orders(symbol=self.quoting_leg.symbol, active=True).values():
                 return self._cancel_order(order, reason="spread too small")
             return False
