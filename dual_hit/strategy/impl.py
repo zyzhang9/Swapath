@@ -14,7 +14,8 @@ from .mixin.status import ArbitrageStatusMixin
 LOGGER = logging.getLogger(__name__)
 
 
-SAME_TRADE_MINIMUM_PERIOD = 0.01 
+SAME_TRADE_MINIMUM_PERIOD = 0.01
+
 
 @dataclass
 class DualHitStrategy(StrategyBase, ArbitrageStatusMixin, QuoteMixin):
